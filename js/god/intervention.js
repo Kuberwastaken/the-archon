@@ -77,13 +77,27 @@
 
 		console.log("[ARCHON] intervention #" + (++self.totalInterventions) + " — snapshot:", snap);
 
-		self.deps.client.callArchon(snap).then(function (resp) {
-			self.executeToolCalls(resp.toolCalls || []);
-		}).catch(function (err) {
-			console.error("[ARCHON] intervention failed:", err);
-		}).then(function () {
-			self.busy = false;
-		});
+		var oracle = window.HORDE_GOD && window.HORDE_GOD.oracle;
+		var fireOracle = oracle && oracle.shouldFire(clearedWaveNumber);
+
+		if (fireOracle) {
+			console.log("[ARCHON] oracle mode — wave " + clearedWaveNumber);
+			oracle.runOracle(snap).then(function (resp) {
+				self.executeToolCalls((resp && resp.toolCalls) || []);
+			}).catch(function (err) {
+				console.error("[ARCHON] oracle failed:", err);
+			}).then(function () {
+				self.busy = false;
+			});
+		} else {
+			self.deps.client.callArchon(snap).then(function (resp) {
+				self.executeToolCalls(resp.toolCalls || []);
+			}).catch(function (err) {
+				console.error("[ARCHON] intervention failed:", err);
+			}).then(function () {
+				self.busy = false;
+			});
+		}
 	};
 
 	Intervention.prototype.executeToolCalls = function (calls) {

@@ -407,9 +407,13 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		var s = horde.sound;
 
 		// Music
+		s.create("intro_music", musicDir + "intro-music", true, 20);
 		s.create("normal_battle_music", musicDir + "normal_battle", true, 20);
 		s.create("final_battle_music", musicDir + "final_battle", true, 20);
 		s.create("victory", musicDir + "victory", true, 20);
+
+		// Archon god-spawn sting
+		s.create("god_spawn", sfxDir + "god-spawn", false, 80);
 
 		// UI
 		s.create("move_pointer", sfxDir + "move_pointer", false, 50);
@@ -530,6 +534,7 @@ proto.initGame = function () {
 
 	this.objects = {};
 	this.state = "title";
+	horde.sound.play("intro_music");
 	this.initOptions();
 
 	this.initMap();
@@ -2152,6 +2157,7 @@ proto.grabContinueInfo = function horde_Engine_proto_grabContinueInfo () {
 				}
 				_this.continuing = true;
 				_this.showTutorial = false;
+				horde.sound.stop("intro_music");
 				_this.state = "intro_cinematic";
 			});
 		}
@@ -2503,6 +2509,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				case 1: // New game
 					this.continuing = false;
 					this.showTutorial = !this.touchMove;
+					horde.sound.stop("intro_music");
 					this.state = "intro_cinematic";
 					break;
 				case 2: // Credits
