@@ -1,0 +1,59 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Inject API key
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python3 - <<'EOF'
+          import os, json
+          key = os.environ.get("ANTHROPIC_API_KEY", "")
+          lines = [
+            "window.GOD_CONFIG = {",
+            "    apiKey: " + json.dumps(key) + ",",
+            '    model: "claude-sonnet-4-6",',
+            "    maxTokens: 1024,",
+            "    enabled: true,",
+            "    awakenAfterWave: 1,",
+            "    minGapMs: 4000",
+            "};",
+          ]
+          with open("js/god/config.local.js", "w") as f:
+              f.write("\n".join(lines) + "\n")
+          print("config.local.js written, key length:", len(key))
+          EOF
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
