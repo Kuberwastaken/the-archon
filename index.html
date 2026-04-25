@@ -27,6 +27,20 @@
 	<script src="js/image_loader.js"></script>
 	<script src="js/spawn_point.js"></script>
 	<script src="js/spawn_wave.js"></script>
+
+	<!-- THE ARCHON — load config first. config.local.js (gitignored) is
+	     the real key; config.example.js is the committed fallback so the
+	     page never 404s. Either way GOD_CONFIG is defined. -->
+	<script src="js/god/config.local.js" onerror="this.onerror=null;var s=document.createElement('script');s.src='js/god/config.example.js';document.head.appendChild(s);"></script>
+	<script src="js/god/bus.js"></script>
+	<script src="js/god/ui.js"></script>
+	<script src="js/god/state.js"></script>
+	<script src="js/god/tools.js"></script>
+	<script src="js/god/persona.js"></script>
+	<script src="js/god/client.js"></script>
+	<script src="js/god/intervention.js"></script>
+	<script src="js/god/god.js"></script>
+
 	<script src="js/run_game.js"></script>
 
 </body>

@@ -129,6 +129,11 @@ horde.Engine = function horde_Engine () {
 	this.canFullscreen = false;
 	this.wasdMovesArrowsAttack = true;
 
+	// THE ARCHON — expose this engine instance so the god module (js/god/*)
+	// can read state, mutate entities, and inject waves at runtime.
+	window.engine = this;
+	horde.engine = this;
+
 };
 
 var proto = horde.Engine.prototype;
@@ -1247,8 +1252,20 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 
 		if(achievementId && !horde.achievementsGranted[achievementId]) {
 			horde.achievementsGranted[achievementId] = true; // so we don't keep sending to Clay.io
-			(new Clay.Achievement({ id: achievementId })).award();
+			// Clay.io can be blocked by browser ORB / ad blockers — guard so the
+			// failure doesn't cascade and skip the Archon's wave_cleared emit.
+			try {
+				if (typeof Clay !== "undefined" && Clay.Achievement) {
+					(new Clay.Achievement({ id: achievementId })).award();
+				}
+			} catch (e) {
+				console.warn("[Clay] achievement award failed:", e && e.message);
+			}
 		}
+
+		// THE ARCHON — wave just cleared. Fire BEFORE incrementing so subscribers
+		// can read the wave id that ended.
+		horde.god.bus.emit("wave_cleared", { waveId: this.currentWaveId });
 
 		this.currentWaveId++;
 		var actualWave = (this.currentWaveId + 1);
@@ -1280,6 +1297,15 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 		}
 
 		this.initSpawnWave(this.waves[this.currentWaveId]);
+
+		// THE ARCHON — new wave is now armed and spawning.
+		horde.god.bus.emit("wave_started", {
+			waveId: this.currentWaveId,
+			displayWave: actualWave,
+			boss: this.waves[this.currentWaveId].bossWave === true,
+			bossName: this.waves[this.currentWaveId].bossName || ""
+		});
+
 		this.waveText.string = waveTextString;
 		this.waveText.alpha = 0;
 		this.waveText.size = 1;
@@ -3033,6 +3059,8 @@ proto.render = function horde_Engine_proto_render () {
 			this.drawCoinPickup(ctx);
 			this.drawWaveText(ctx);
 			this.drawUI(ctx);
+			// THE ARCHON — render narration on top of the UI but under the pause menu.
+			horde.god.drawNarration(ctx);
 			if (this.paused) {
 				this.drawPaused(ctx);
 				this.drawPointer(ctx);

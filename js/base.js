@@ -4,6 +4,16 @@
  */
 var horde = {};
 
+// THE ARCHON — namespace stub. Real implementation in js/god/god.js.
+// Stubbed up front so engine code can call horde.god.bus.emit(...) and
+// horde.god.drawNarration?.(ctx) safely whether or not the god module loads.
+horde.god = {
+	ready: false,
+	bus: { emit: function () {}, on: function () {} },
+	drawNarration: function () {},
+	timeScale: 1
+};
+
 horde.canvasFallbackContent = "<div class=\"fallback\"><p>Your browser does not appear to support <a href=\"http://en.wikipedia.org/wiki/HTML5\">HTML5</a>.</p><p>Please try one of the following, more standards compliant browsers: <a href=\"http://www.google.com/chrome\">Chrome</a>, <a href=\"http://www.apple.com/safari/\">Safari</a>, <a href=\"http://www.mozilla.com/firefox/\">Firefox</a> or <a href=\"http://www.opera.com/\">Opera</a>.</p></div>";
 
 // Bind a function to a particular context

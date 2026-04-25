@@ -1,2 +1,5 @@
 .DS_Store
 build
+
+# Anthropic API key — never commit
+js/god/config.local.js
