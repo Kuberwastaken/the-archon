@@ -1,6 +1,6 @@
 (function define_horde_Engine () {
 
-var VERSION = "{{VERSION}}";
+var VERSION = "1.6.7";
 var SCREEN_WIDTH = 640;
 var SCREEN_HEIGHT = 480;
 var URL_STORE = "https://chrome.google.com/extensions/detail/khodnfbkbanejphecblcofbghjdgfaih";
@@ -2456,25 +2456,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				}
 			}
 		}
-		// Clay.io: Login
-		startY += 20;
-		if (
-			!this.loggedIn
-			&& (mouseV.x >= startX && mouseV.x <= stopX)
-			&& (mouseV.y >= startY && mouseV.y < (startY + 18)) // 18 = height of button
-		) {
-			this.loginHover = true;
-			if (this.mouse.isButtonDown(buttons.LEFT)) {
-				if(!this.loginShowFlag) {
-					this.loginShowFlag = true; // So the LB only shows once (with a 1 second 'cooldown')
-					Clay.Player.login();
-					var _this = this;
-					setTimeout(function() {
-						_this.loginShowFlag = false;
-					}, 1000);
-				}
-			}
-		}
 
 		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
 
@@ -3941,20 +3922,6 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.fillText(highScore, 320, 460);
 	ctx.restore();
 
-	// Clay.io: Login button
-	var highScore = this.loggedIn ? ("Logged In as " + Clay.Player.data.username) : ("Login with Clay.io");
-
-	ctx.save();
-	ctx.font = "Bold 12px MedievalSharp";
-	ctx.textAlign = "center";
-
-	ctx.fillStyle = COLOR_BLACK;
-	ctx.fillText(highScore, 322, 476);
-
-	ctx.fillStyle = this.loginHover ? "rgb(180, 180, 180)" : grey;
-	ctx.fillText(highScore, 320, 474);
-	ctx.restore();
-
 	// Version
 	var version = ("v" + VERSION);
 	if (horde.isDemo()) version += " demo";
@@ -3970,26 +3937,24 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.restore();
 
 	// Copyright text
-	var copyright = "Lost Decade Games";
 	ctx.save();
 	ctx.font = "Bold 14px Monospace";
 
 	ctx.fillStyle = COLOR_BLACK;
-	ctx.fillText(copyright, 6, 462);
+	ctx.fillText("kuberwastaken &", 6, 458);
 
 	ctx.fillStyle = grey;
-	ctx.fillText(copyright, 4, 460);
+	ctx.fillText("kuberwastaken &", 4, 456);
 	ctx.restore();
 
-	var copyrightDate = "\u00A9 2010";
 	ctx.save();
 	ctx.font = "Bold 14px Monospace";
 
 	ctx.fillStyle = COLOR_BLACK;
-	ctx.fillText(copyrightDate, 6, 478);
+	ctx.fillText("lost decade games  © 2026", 6, 478);
 
 	ctx.fillStyle = grey;
-	ctx.fillText(copyrightDate, 4, 476);
+	ctx.fillText("lost decade games  © 2026", 4, 476);
 	ctx.restore();
 
 };
