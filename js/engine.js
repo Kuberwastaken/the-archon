@@ -916,7 +916,7 @@ proto.update = function horde_Engine_proto_update () {
 			} else {
 				this.handleInput();
 			}
-			if (!this.paused) {
+			if (!this.paused && !this._archonFrozen) {
 				this.updateWaves(elapsed);
 				this.updateSpawnPoints(elapsed);
 				this.updateClouds(elapsed);
@@ -2628,7 +2628,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 	if (this.state === "running") {
 		var player = this.getPlayerObject();
 
-		if (this.paused || player.hasState(horde.Object.states.DYING)) {
+		if (this.paused || this._archonFrozen || player.hasState(horde.Object.states.DYING)) {
 			this.keyboard.storeKeyStates();
 			return;
 		}

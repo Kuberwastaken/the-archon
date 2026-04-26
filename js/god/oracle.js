@@ -402,11 +402,11 @@
 		var ui = window.HORDE_GOD && window.HORDE_GOD.ui;
 		var engine = getEngine();
 
-		// Freeze the simulation immediately — the oracle holds time still.
-		if (engine) engine.paused = true;
+		// Freeze the simulation silently — no pause menu, just stops the world.
+		if (engine) engine._archonFrozen = true;
 
 		function unpause() {
-			if (engine) engine.paused = false;
+			if (engine) engine._archonFrozen = false;
 		}
 
 		return generateQuestion(snapshot).then(function (question) {
