@@ -443,6 +443,28 @@
 			}
 			var count = clamp(args.count || 1, 1, 5);
 			var loc = args.location || "random";
+			var typeDef = horde.objectTypes[args.type];
+			var isMonster = typeDef && typeDef.role === "monster";
+
+			if (isMonster && engine.spawnPoints && engine.spawnPoints.length) {
+				// Route monsters through the real spawn gates so they enter exactly
+				// like wave enemies: spawned above the gate, direction.y=1, AI
+				// guard activates once they cross y=50. Without this they spawn
+				// with direction={0,0} and stand frozen at the placement point.
+				for (var i = 0; i < count; i++) {
+					var spIdx = Math.floor(Math.random() * engine.spawnPoints.length);
+					engine.spawnPoints[spIdx].queueSpawn(args.type, 1);
+				}
+				// If gates are closed (between waves) force them open so the queue drains.
+				if (engine.gateState !== "up") {
+					engine.openGates();
+				}
+				var result = "spawned " + count + "x " + args.type + " via gate";
+				record("spawn", args, result);
+				return result;
+			}
+
+			// Non-monster types (items, weapons): place directly in the arena.
 			for (var i = 0; i < count; i++) {
 				var pos = spawnLocationToVector(loc === "random" ? "random" : (i === 0 ? loc : "random"));
 				var o = horde.makeObject(args.type);
